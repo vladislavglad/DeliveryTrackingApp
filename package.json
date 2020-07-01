@@ -1,0 +1,27 @@
+{
+  "name": "delivery-tracker-app",
+  "version": "1.0.0",
+  "description": "App that tracks delivery of your package through UPS, USPS, Lasership.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vladislavglad/delivery-tracker-app.git"
+  },
+  "keywords": [
+    "delivery",
+    "tracking"
+  ],
+  "author": "vladislavglad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vladislavglad/delivery-tracker-app/issues"
+  },
+  "homepage": "https://github.com/vladislavglad/delivery-tracker-app#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.9.21"
+  }
+}
