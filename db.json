@@ -1,0 +1,23 @@
+[
+  {
+    "username": "vlad",
+    "email": "vlad@mail.com",
+    "trackingNum": "123",
+    "isDelivered": false,
+    "shouldNotify": true
+  },
+  {
+    "username": "glad",
+    "email": "glad@mail.com",
+    "trackingNum": "321",
+    "isDelivered": false,
+    "shouldNotify": false
+  },
+  {
+    "username": "dalv",
+    "email": "dalv@mail.com",
+    "trackingNum": "456",
+    "isDelivered": true,
+    "shouldNotify": true
+  }
+]
