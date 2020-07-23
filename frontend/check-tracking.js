@@ -30,5 +30,6 @@ form.addEventListener("submit", (event) => {
         console.log(err);
         statusReportDiv.innerHTML = "Something went wrong! Please, try again.";
         statusReportDiv.style.color = "#FF6347";
+        statusReportDiv.style.display = "block";
     });
 });

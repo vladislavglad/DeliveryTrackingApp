@@ -11,6 +11,7 @@
     <header>
         <h1 class="title">Request Tracking</h1>
     </header>
+    <h5 class="title" id="requestStatus" style="display: none;"></h5>
     <form>
         <div class="row">
             <div class="six columns">
@@ -21,20 +22,20 @@
         <div class="row">
             <div class="six columns">
                 <label for="email">Your email</label>
-                <input class="u-full-width" type="email" placeholder="test@mailbox.com" id="userEmail">
+                <input class="u-full-width" type="email" placeholder="test@mailbox.com" id="userEmail" required>
             </div>
         </div>
         <div class="row">
             <div class="six columns">
                 <label for="trackingnum">Tracking Number</label>
-                <input class="u-full-width" type="text" placeholder="your tracking number" id="userTrackingNumber">
+                <input class="u-full-width" type="text" placeholder="your tracking number" id="userTrackingNumber" required>
             </div>
         </div>  
         <div class="row"> 
             <div class="six columns">
                 <label>
                     <input type="checkbox" id="userNotification">
-                    <span class="label-body" style="margin-left: auto;" id="userNotification">Notify me of Delivery</span>
+                    <span class="label-body" style="margin-left: auto;" id="userNotification">Notify me of delivery</span>
                 </label>  
             </div>     
         </div>       

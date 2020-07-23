@@ -11,7 +11,7 @@
     <header>
         <h1 class="title">Check Tracking Status</h1>
     </header>
-    <form>  
+    <form id="requestForm">  
         <div class="container">  
             <div class="row">
                 <div class="six columns">
@@ -20,14 +20,15 @@
                 </div>
             </div>
             <div class="row">
-                <div class="six columns" id="report-delivery-status" style="display: none;">
-                    <!-- Report Delivery Status Here -->
+                <div class="six columns">
+                    <h6 id="report-delivery-status" style="display: none;"></h6>
                 </div>
             </div>
             <div class="row">
                 <div class="six columns">
                     <input class="button-primary" type="submit" value="Submit">
                 </div>
+            </div>
         </div>
     </form>
     <script src="check-tracking.js"></script>
