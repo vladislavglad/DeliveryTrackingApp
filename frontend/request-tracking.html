@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Request Tracking</title>
+</head>
+<body>
+    <header>
+        <h1 class="title">Request Tracking</h1>
+    </header>
+    <form>
+        <div class="row">
+            <div class="six columns">
+                <label for="name">Your name</label>
+                <input class="u-full-width" type="text" placeholder="John Doe" id="userName">
+            </div>
+        </div>
+        <div class="row">
+            <div class="six columns">
+                <label for="email">Your email</label>
+                <input class="u-full-width" type="email" placeholder="test@mailbox.com" id="userEmail">
+            </div>
+        </div>
+        <div class="row">
+            <div class="six columns">
+                <label for="trackingnum">Tracking Number</label>
+                <input class="u-full-width" type="text" placeholder="your tracking number" id="userTrackingNumber">
+            </div>
+        </div>  
+        <div class="row"> 
+            <div class="six columns">
+                <label>
+                    <input type="checkbox" id="userNotification">
+                    <span class="label-body" style="margin-left: auto;" id="userNotification">Notify me of Delivery</span>
+                </label>  
+            </div>     
+        </div>       
+        <div class="row">
+            <div class="six columns">
+                <input class="button-primary" type="submit" value="Submit">
+            </div>
+        </div>
+    </form>
+    <script src="make-request.js"></script>
+</body>
+</html>
