@@ -1,4 +1,5 @@
 const fs = require("fs");
+const cors = require("cors");
 const express = require("express");
 const app = express();
 const port = 3000;
@@ -14,6 +15,8 @@ fs.readFile("./db.json", "utf8",  (err, data) => {
         console.log(db);      
     }
 });
+
+app.use(cors());
 
 // Built-in middleware to support JSON-encoded bodies.
 app.use(express.json()); 
@@ -42,7 +45,7 @@ app.get("/lookup/:trackingNum", (req, res) => {
 
 });
 
-app.post("/addTracking", (req, res) => {
+app.post("/requestTracking", (req, res) => {
     console.log("\nrecieved new POST request:");
     console.log(req.body);
     db.push(req.body);
