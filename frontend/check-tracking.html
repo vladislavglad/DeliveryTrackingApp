@@ -8,8 +8,28 @@
     <title>Check Tracking</title>
 </head>
 <body>
-    <form>
-
+    <header>
+        <h1 class="title">Check Tracking Status</h1>
+    </header>
+    <form>  
+        <div class="container">  
+            <div class="row on-submit">
+                <div class="six columns">
+                    <label for="trackingNum">Please Provide Your Tracking Number</label>
+                    <input class="u-full-width" type="text" id="trackingNum">
+                </div>
+            </div>
+            <div class="row">
+                <div class="six columns" id="report-delivery-status" style="display: none;">
+                    <!-- Report Delivery Status Here -->
+                </div>
+            </div>
+            <div class="row on-submit">
+                <div class="six columns">
+                    <input class="button-primary" type="submit" value="Submit">
+                </div>
+        </div>
     </form>
+    <script src="check-tracking.js"></script>
 </body>
 </html>
