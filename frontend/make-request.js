@@ -1,6 +1,6 @@
 const form = document.querySelector("form");
 const requestStatus = document.getElementById("requestStatus");
-//const requestBtn = document.getElementById("make-another-request");
+const anotherRequest = document.getElementById("anotherRequest");
 const API = "http://localhost:3000/requestTracking";
 
 form.addEventListener("submit", (event) => {
@@ -32,7 +32,7 @@ form.addEventListener("submit", (event) => {
             requestStatus.style.color = "#00FF7F";
             form.style.display = "none";
             requestStatus.style.display = "block";
-            //requestBtn.style.display = "block"; 
+            anotherRequest.style.display = "block";
         } else {
             requestStatus.innerHTML = "Invalid tracking number! Try again."
             requestStatus.style.color = "#FF6347";
