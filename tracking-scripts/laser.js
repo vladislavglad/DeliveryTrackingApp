@@ -1,53 +1,51 @@
 const fetch = require('node-fetch');
-const open = require('open');
 
 // Use official lasership API to check the status.
 const laserAPI = `http://www.lasership.com/track/YOURTRACKINGNUMBER/json`;
 
 async function checkDeliveryStatus(trackingNum) {
-    let trackingURL = laserAPI.replace("YOURTRACKINGNUMBER", trackingNum);
+    const trackingURL = laserAPI.replace("YOURTRACKINGNUMBER", trackingNum);
+    let delivery = {};
 
-    console.log("Fetching response...");
+    //console.log("Fetching response...");
     const response = await fetch(trackingURL);
-    console.log("Fetching has finished!")
+    //console.log("Fetching has finished!")
 
-    console.log("Parsing response into JSON...");
+    //console.log("Parsing response into JSON...");
     const jsonData = await response.json();
     if (jsonData.Error) {
-        console.error("Failed to parse: " + jsonData.ErrorMessage);
-        return;
+        //console.error("Failed to parse: " + jsonData.ErrorMessage);
+        delivery.status = null;
+        return delivery;
     }
-    console.log("Finished Parsing!");
+    //console.log("Finished Parsing!");
     //console.log(jsonData);
 
-    let isDelivered = false;
     jsonData.Events.forEach(event => {
-        if (event.EventType === "Delivered") {
-            isDelivered = true;
+        if (event.EventType.toLowerCase() === "delivered") {
+            delivery.status = true;
             return;
         }
     });
 
-    if (isDelivered) {
-        console.log("---\nYour package was delivered!\n");
-
-        // Opens the url in the default browser as proof of delivery. 
-        open(`http://www.lasership.com/track/${trackingNum}`);
-        return isDelivered;
-
+    if (delivery.status) {
+        //console.log("---\nYour package was delivered!\n");
+        return delivery;
     } else {
-        console.log("---\nYour package was not delivered...\n");
-        return isDelivered;
+        //console.log("---\nYour package was not delivered...\n");
+        delivery.status = false;
+        return delivery;
     }
 }
 
 function startTracking(trackingNum) {
-    let id = setInterval(() => {
-        if(checkDeliveryStatus(trackingNum))
-            clearInterval(id);
+    let id = setTimeout(() => {
+        if(checkDeliveryStatus(trackingNum).status)
+            clearTimeout(id);
     }, 30 * 1000);
 }
 
-// Provide your own tracking number.
-let trackingNum = "YOURTRACKINGNUMBER";
-// startTracking(trackingNum);
+//let trackingNum = "YOURTRACKINGNUMBER";
+//checkDeliveryStatus(trackingNum).then(res => console.log(res));
+
+module.exports = checkDeliveryStatus;

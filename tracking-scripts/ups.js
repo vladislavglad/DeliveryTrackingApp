@@ -18,11 +18,11 @@ async function checkDeliveryStatus(trackingNum) {
     try {
         const res = await nightmare
         .goto(trackingURL)
-        .wait("div.ups-card_content") //div.ups-card_content
+        .wait("div.ups-card_content")
         .evaluate(() => document.querySelector("#stApp_txtPackageStatus").innerHTML)
         .end();
 
-        if (res === "Delivered")
+        if (res.toLowerCase() === "delivered")
             delivery.status = true;
         else 
             delivery.status = false;
@@ -39,5 +39,7 @@ async function checkDeliveryStatus(trackingNum) {
 //     console.log($(response).text().replace(/\s\s+/g, " ").toLowerCase());
 // }
 
-let trackingNum = "YOURTRACKINGNUMBER";
-// checkDeliveryStatus(trackingNum).then(res => console.log(res));
+//let trackingNum = "YOURTRACKINGNUMBER";
+//checkDeliveryStatus(trackingNum).then(res => console.log(res));
+
+module.exports = checkDeliveryStatus;

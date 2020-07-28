@@ -18,10 +18,10 @@ async function checkDeliveryStatus(trackingNum) {
     const description = statusContainer.find(".important").text().toLowerCase();
     //console.log(`currentStatus: ${currentStatus}\ndescription: ${description}`);
 
-    let delivery = {status: null};
+    let delivery = {};
     if (currentStatus.includes("status not available"))  { //|| description.includes("delivered"))
         //console.log("Your tracking number is invalid!");
-        return delivery;
+        delivery.status = null;
     } else if (currentStatus.includes("delivered")) {
         //console.log("Your package has been delivered!");
         delivery.status = true;
@@ -33,5 +33,7 @@ async function checkDeliveryStatus(trackingNum) {
     return delivery;
 }
 
-let trackingNum = "YOURTRACKINGNUMBER";
+//let trackingNum = "YOURTRACKINGNUMBER";
 //checkDeliveryStatus(trackingNum).then(res => console.log(res));
+
+module.exports = checkDeliveryStatus;
