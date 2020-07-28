@@ -16,6 +16,9 @@ fs.readFile("./db.json", "utf8",  (err, data) => {
     }
 });
 
+// Serve static pages.
+app.use("/static", express.static("public"));
+
 app.use(cors());
 
 // Built-in middleware to support JSON-encoded bodies.

@@ -1,7 +1,8 @@
 const form = document.querySelector("form");
 const requestStatus = document.getElementById("requestStatus");
 const anotherRequest = document.getElementById("anotherRequest");
-const API = "http://localhost:3000/requestTracking";
+const config = require("./config");
+const API = `http://${config.ip}:3000/requestTracking`;
 
 form.addEventListener("submit", (event) => {
     event.preventDefault();

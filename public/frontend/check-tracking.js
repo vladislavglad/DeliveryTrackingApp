@@ -1,7 +1,8 @@
 const form = document.querySelector("form");
 const textField = document.getElementById("trackingNum");
 const statusReportDiv = document.getElementById("report-delivery-status");
-const API = "http://localhost:3000/lookup/:trackingNum";
+const config = require("./config");
+const API = `http://${config.ip}:3000/lookup/:trackingNum`;
 
 form.addEventListener("submit", (event) => {
     event.preventDefault();
