@@ -1,6 +1,7 @@
 const fs = require("fs");
 const cors = require("cors");
 const express = require("express");
+const determineCourier = require("./tracking-scripts/determine-courier");
 
 require("dotenv").config();
 
@@ -20,12 +21,8 @@ fs.readFile("./db.json", "utf8",  (err, data) => {
 });
 
 app.use(cors());
-
-// Built-in middleware to support JSON-encoded bodies.
-app.use(express.json()); 
-
-// To support URL-encoded bodies.
-app.use(express.urlencoded()); 
+app.use(express.urlencoded()); // To support URL-encoded bodies.
+app.use(express.json()); // Built-in middleware to support JSON-encoded bodies.
 
 app.get("/", (req, res) => {
     res.send({msg: "Hello Customer!"});
@@ -51,14 +48,23 @@ app.get("/lookup/:trackingNum", (req, res) => {
 app.post("/requestTracking", (req, res) => {
     console.log("\nrecieved new POST request:");
     console.log(req.body);
-    db.push(req.body);
-    console.log('"Added" to db');
+
+    if (req.body.email === "")
+        res.send({msg: "Please provide valid email!"});
+    else if (req.body.trackingNum === "")
+        res.send({msg: 'Please provide a tracking number!'});
+    else if (determineCourier(req.body.trackingNum) === null)
+        res.send({msg: "Your tracking number is invalid!"});
+    else {
+        db.push(req.body);
+        console.log('"Added" to db');
+        res.send({msg: "Recieved successfully!"});
+    }
 
     // fs.appendFile("./db.json", JSON.stringify(req.body, null, 2), () => {
     //     console.log("Added to db");
     // });
 
-    res.send({msg: "recieved successfully!"});
 });
 
 app.post("/update/:trackingNum/", (req, res) => {
