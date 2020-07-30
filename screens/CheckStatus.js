@@ -12,6 +12,7 @@ export default function CheckStatus( {navigation} ) {
 
     const res = await fetch(API.replace(":trackingNum", trackingNum));
     const data = await res.json();
+    //console.log(data);
 
     if (data.trackingNum) {
       if (data.isDelivered)

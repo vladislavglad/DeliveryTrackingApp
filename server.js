@@ -1,7 +1,7 @@
-const fs = require("fs");
 const cors = require("cors");
 const express = require("express");
 const mongoose = require('mongoose');
+const Request = require("./models/request.model");
 const determineCourier = require("./tracking-scripts/determine-courier");
 
 require("dotenv").config();
@@ -11,22 +11,10 @@ const port = process.env.SERVER_PORT || 3000;
 
 // Establish connection.
 mongoose.connect(process.env.ATLAS_URI, {useNewUrlParser: true, useUnifiedTopology: true});
-const mongoDB = mongoose.connection;
-mongoDB.on('error', console.error.bind(console, 'connection error:'));
-mongoDB.once('open', function() {
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
     console.log("Connection to MongoDB has been established successfylly!");
-});
-
-let db; // Temporary non-persistent database (will later use MongoDB)
-fs.readFile("./db.json", "utf8",  (err, data) => {
-    console.log("reading db. . .");
-    if (err)
-        console.log("unable to read db!");
-    else {
-        db = JSON.parse(data);
-        console.log("reading db complete:"); 
-        //console.log(db);      
-    }
 });
 
 app.use(cors());
@@ -34,29 +22,40 @@ app.use(express.urlencoded()); // To support URL-encoded bodies.
 app.use(express.json()); // Built-in middleware to support JSON-encoded bodies.
 
 app.get("/", (req, res) => {
-    res.send({msg: "Hello Customer!"});
+    res.send({msg: "Server is running!"});
 });
 
-app.get("/all", (req, res) => {
-    res.send(db);
-});
-
-app.get("/lookup/:trackingNum", (req, res) => {
-    
-    for (let i = 0; i < db.length; i++) {
-        if (db[i].trackingNum === req.params.trackingNum) {
-            res.send(db[i]);
-            return;
-        }
+// Everything you retrieve from MongoDB is in JavaScript object format (not JSON).
+app.get("/all", async (req, res) => {
+    try {
+        const allRequests = await Request.find();
+        //console.log(allRequests);
+        res.json(allRequests);
+    } catch(err){
+        console.log(err);
+        res.status(400).send({msg: "Error: " + err})
     }
+});
 
-    res.send({msg: "invalid tracking number!"});
-
+app.get("/lookup/:trackingNum", async (req, res) => {
+    const recievedNum = req.params.trackingNum;
+    //console.log("Recieved from user: " + recievedNum);
+    try {
+        const requestEntry = await Request.findOne( {trackingNum: recievedNum} ).exec();
+        //console.log("Found in DB: " + requestEntry);
+        if (!requestEntry) // in case nothing was found -> null
+            res.send({msg: "No such entry found!"});
+        else 
+            res.send(requestEntry);
+    } catch(err) {
+        //console.log(err);
+        res.status(400).send({msg: err});
+    }
 });
 
 app.post("/requestTracking", (req, res) => {
-    console.log("\nrecieved new POST request:");
-    console.log(req.body);
+    // console.log("\nrecieved new POST request:");
+    // console.log(req.body);
 
     if (req.body.email === "")
         res.send({msg: "Please provide valid email!"});
@@ -65,41 +64,73 @@ app.post("/requestTracking", (req, res) => {
     else if (determineCourier(req.body.trackingNum) === null)
         res.send({msg: "Your tracking number is invalid!"});
     else {
-        db.push(req.body);
-        console.log('"Added" to db');
-        res.send({msg: "Recieved successfully!"});
+        const newEntry = new Request({
+            username: req.body.username,
+            email: req.body.email,
+            trackingNum: req.body.trackingNum,
+            courier: determineCourier(req.body.trackingNum),
+            isDelivered: false
+        })
+        .save((err, entry) => {
+            if (err) {
+                //console.log(err);
+                res.send({msg: err});
+            } else {
+                // console.log("New entry has been added:");
+                // console.log(entry);
+                res.send({msg: "Recieved successfully!"});
+            }
+        });
     }
-
-    // fs.appendFile("./db.json", JSON.stringify(req.body, null, 2), () => {
-    //     console.log("Added to db");
-    // });
 
 });
 
-app.post("/update/:trackingNum/", (req, res) => {
+app.post("/update/:trackingNum/", async (req, res) => {
+    const {username, email, trackingNum} = req.body;
+    //console.log(username, email, trackingNum);
 
-    for (let i = 0; i < db.length; i++) {
-        if (db[i].trackingNum === req.params.trackingNum) {
-            db[i] = req.body;
-            res.send({msg: "updated successfully!"});
-            return;
+    try {
+        const entry = await Request.findOneAndUpdate( {trackingNum: req.params.trackingNum});
+
+        if (entry.length === 0)
+            res.send({msg: "No such entry found!"});
+        else {
+            entry.username = username;
+            entry.email = email;
+            entry.trackingNum = trackingNum;
+            entry.save( (err, updatedEntry) => {
+                if (err) {
+                    //console.log(err);
+                    res.send({msg: err});
+                } else {
+                    //console.log(updatedEntry);
+                    res.send({msg: "Successfully updated!"});
+                }
+            });
         }
+    } catch(err) {
+        //console.log(err);
+        res.send({msg: err});
     }
 
-    res.send({msg: "invalid tracking number!"});
 });
 
-app.delete("/delete/:trackingNum", (req, res) => {
+app.delete("/delete/:trackingNum", async (req, res) => {
+    // console.log("Recieved from user" : req.params.trackingNum);
 
-    for (let i = 0; i < db.length; i++) {
-        if (db[i].trackingNum === req.params.trackingNum) {
-            db.splice(i, 1);
-            res.send({msg: "delited successfully!", trackingNum: req.params.trackingNum});
-            return;
-        }
+    try {
+        const entry = Request.findOneAndDelete( {trackingNum: req.body.trackingNum});
+        // console.log(entry);
+
+        if (entry.length === 0)
+            res.send({msg: "No such entry found!"});
+        else
+            res.send({msg: "Request was succesfully delited!"});
+    } catch(err) {
+        // console.log(err);
+        res.send({msg: err});
     }
 
-    res.send({msg: "invalid tracking number!"});
 });
 
 app.listen(port, () => console.log(`Server's URL is ${process.env.SERVER_URL}`));
