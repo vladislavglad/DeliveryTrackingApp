@@ -1,12 +1,21 @@
 const fs = require("fs");
 const cors = require("cors");
 const express = require("express");
+const mongoose = require('mongoose');
 const determineCourier = require("./tracking-scripts/determine-courier");
 
 require("dotenv").config();
 
 const app = express();
 const port = process.env.SERVER_PORT || 3000;
+
+// Establish connection.
+mongoose.connect(process.env.ATLAS_URI, {useNewUrlParser: true, useUnifiedTopology: true});
+const mongoDB = mongoose.connection;
+mongoDB.on('error', console.error.bind(console, 'connection error:'));
+mongoDB.once('open', function() {
+    console.log("Connection to MongoDB has been established successfylly!");
+});
 
 let db; // Temporary non-persistent database (will later use MongoDB)
 fs.readFile("./db.json", "utf8",  (err, data) => {
@@ -16,7 +25,7 @@ fs.readFile("./db.json", "utf8",  (err, data) => {
     else {
         db = JSON.parse(data);
         console.log("reading db complete:"); 
-        console.log(db);      
+        //console.log(db);      
     }
 });
 
