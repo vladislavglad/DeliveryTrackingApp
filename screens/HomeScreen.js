@@ -2,32 +2,32 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 
-// Custom componenets.
+// Custom componenets...
 import Title from "../components/Title"
 
 export default function HomeScreen( {navigation} ) {
 
   return (
-    <View>
-        <Title 
-            titleText = "About this app"
-        />
-
-        <Text>Text from navigation: {navigation.title}</Text>
-
+    <View style={styles.container}>
+      <View style={styles.textContainer}>
+        <Text style={styles.text}>What would you like to do?</Text>
+      </View>
+      <View style={styles.buttonContainer}>
         <Button 
-            onPress={ () => {
-                navigation.navigate("requestScreen", {msg: "Passing msg to request Delivery!"});
-            }}
-            title = "To Request"
+          onPress={ () => {
+            navigation.navigate("requestScreen", {msg: "Passing msg to request Delivery!"});
+          }}
+          title = "Request Tracking"
         />
-        <Button 
-            onPress={ () => {
-                navigation.navigate("checkScreen", {msg: "Passing msg to check Delivery!"});
-            }}
-            title = "To Check"
+      </View>
+      <View style={styles.buttonContainer}>
+      <Button 
+          onPress={ () => {
+            navigation.navigate("checkScreen", {msg: "Passing msg to check Delivery!"});
+          }}
+          title = "Check Status"
         />
-
+      </View>
       <StatusBar style="auto" />
     </View>
   );
@@ -36,9 +36,21 @@ export default function HomeScreen( {navigation} ) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "column",
+    justifyContent: "center"
+  },
+  buttonContainer: {
+    flexDirection: "column",
+    margin: 15,
+  },
+  textContainer: {
+    flexDirection: "row",
+    margin: 20,
+    justifyContent: "center"
+  },
+  text: {
+    fontSize: 20,
+    marginTop: 20,
+    textAlign: "center"
   }
 });
