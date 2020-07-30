@@ -1,8 +1,11 @@
 const fs = require("fs");
 const cors = require("cors");
 const express = require("express");
+
+require("dotenv").config();
+
 const app = express();
-const port = 3000;
+const port = process.env.SERVER_PORT || 3000;
 
 let db; // Temporary non-persistent database (will later use MongoDB)
 fs.readFile("./db.json", "utf8",  (err, data) => {
@@ -84,4 +87,4 @@ app.delete("/delete/:trackingNum", (req, res) => {
     res.send({msg: "invalid tracking number!"});
 });
 
-app.listen(port, () => console.log(`Server is listening on ${port}`));
+app.listen(port, () => console.log(`Server's URL is ${process.env.SERVER_URL}`));

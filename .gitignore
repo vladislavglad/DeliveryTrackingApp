@@ -1,4 +1,5 @@
 trackingNums.txt
+.env
 
 node_modules/**/*
 .expo/*
