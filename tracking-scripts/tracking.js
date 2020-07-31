@@ -19,6 +19,7 @@ function determineCourier(trackingNum) {
                 courier = _UPS;
             break;
         case 22:
+            if (trackingNum.charAt(0) === "9" && trackingNum.charAt(1) === "3")
             courier = _USPS;
             break;
 
@@ -56,7 +57,7 @@ async function checkDelivery(trackingNum, courier = null) {
     return delivery;
 }
 
-//checkDelivery("9361289727009065855945").then(res => console.log(res));
+//checkDelivery("YOURTRACKINGNUMBER").then(res => console.log(res));
 
 module.exports = {
     determineCourier, 

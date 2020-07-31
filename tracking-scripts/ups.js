@@ -12,7 +12,7 @@ async function checkDeliveryStatus(trackingNum) {
     const trackingURL = URL.replace("YOURTRACKINGNUMBER", trackingNum);
     //console.log(trackingURL);
 
-    const nightmare = Nightmare();
+    const nightmare = Nightmare({waitTimeout: 60 * 1000});
     let delivery = {};
 
     try {
