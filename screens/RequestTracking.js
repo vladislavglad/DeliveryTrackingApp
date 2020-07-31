@@ -81,7 +81,7 @@ async function sendRequest(username, email, trackingNum) {
             Alert.alert("Success:", "Your request has been processed!");
         else if (serverResponse.msg === "Bad/invalid request!")  
             Alert.alert("Error:", "You provided invalid information!\n\nPlease Try again.");
-        else 
+        else // Causes crashing (if not careful) with Java Exception: UnexpectedNativeTypeException.
             Alert.alert("Error:", serverResponse.msg);
 
     } catch (err) {

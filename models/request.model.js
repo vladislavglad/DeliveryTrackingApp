@@ -21,6 +21,10 @@ const requestSchema = new mongoose.Schema({
     isDelivered: {
         type: Boolean,
         default: false
+    },
+    sentEmail: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

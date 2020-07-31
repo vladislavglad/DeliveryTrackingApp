@@ -70,12 +70,12 @@ app.post("/requestTracking", (req, res) => {
             email: req.body.email,
             trackingNum: req.body.trackingNum,
             courier: Tracking.determineCourier(req.body.trackingNum),
-            isDelivered: false
+            // isDelivered: false // Already, taken care by the 'default' attribute in DB Schema.
         })
         .save((err, entry) => {
             if (err) {
                 //console.log(err);
-                res.send({msg: err});
+                res.send({msg: "Duplicate record detected!"}); // Causes crashing if sending err directly.
             } else {
                 // console.log("New entry has been added:");
                 // console.log(entry);
@@ -139,19 +139,34 @@ async function runSingleDeliveryCheck() {
     //console.log(entries);
 
     entries.forEach(async entry => {
+        const {email, username} = entry;
+
         if (!entry.isDelivered) {
-            const {email, username} = entry;
             const status = await Tracking.checkDelivery(entry.trackingNum, entry.courier);
             //console.log(`email: ${email}, status: ${status}`);
 
             if (status.delivered) {
                 entry.isDelivered = true;
-                entry.save();
-                console.log("Sending email to the client" + email);
+                // entry.save();
+                console.log("Sending email to the client " + email);
                 sendEmail(email, username)
-                    .then(()=> console.log("Email has been sent!"))
+                    .then(() => {
+                        console.log("Email has been sent!");
+                        entry.sentEmail = true;
+                        entry.save();
+                    })
                     .catch(err => console.log(err));
             }
+
+        } else if (!entry.sentEmail) {
+            console.log("Sending email to the client " + email)
+            sendEmail(email, username)
+                .then(() => {
+                    console.log("Email has been sent!");
+                    entry.sentEmail = true;
+                    entry.save();
+                })
+                .catch(err => console.log(err));
         }
     });
 
