@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require('mongoose');
 const Request = require("./models/request.model");
 const Tracking = require("./tracking-scripts/tracking");
+const sendEmail = require("./email/send-email");
 
 require("dotenv").config();
 
@@ -139,19 +140,22 @@ async function runSingleDeliveryCheck() {
 
     entries.forEach(async entry => {
         if (!entry.isDelivered) {
-            const email = entry.email;
+            const {email, username} = entry;
             const status = await Tracking.checkDelivery(entry.trackingNum, entry.courier);
             //console.log(`email: ${email}, status: ${status}`);
 
             if (status.delivered) {
                 entry.isDelivered = true;
                 entry.save();
-                console.log("Emailing the client at " + email);
+                console.log("Sending email to the client" + email);
+                sendEmail(email, username)
+                    .then(()=> console.log("Email has been sent!"))
+                    .catch(err => console.log(err));
             }
         }
     });
 
-    console.log("All delivery check are done!");
+    console.log("All delivery checks are done!");
 }
 
 function runDeliveryChecks(interval = 180 * 1000) {
