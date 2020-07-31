@@ -2,7 +2,7 @@ const cors = require("cors");
 const express = require("express");
 const mongoose = require('mongoose');
 const Request = require("./models/request.model");
-const determineCourier = require("./tracking-scripts/determine-courier");
+const Tracking = require("./tracking-scripts/tracking");
 
 require("dotenv").config();
 
@@ -61,14 +61,14 @@ app.post("/requestTracking", (req, res) => {
         res.send({msg: "Please provide valid email!"});
     else if (req.body.trackingNum === "")
         res.send({msg: 'Please provide a tracking number!'});
-    else if (determineCourier(req.body.trackingNum) === null)
+    else if (Tracking.determineCourier(req.body.trackingNum) === null)
         res.send({msg: "Your tracking number is invalid!"});
     else {
         const newEntry = new Request({
             username: req.body.username,
             email: req.body.email,
             trackingNum: req.body.trackingNum,
-            courier: determineCourier(req.body.trackingNum),
+            courier: Tracking.determineCourier(req.body.trackingNum),
             isDelivered: false
         })
         .save((err, entry) => {
@@ -133,4 +133,34 @@ app.delete("/delete/:trackingNum", async (req, res) => {
 
 });
 
-app.listen(port, () => console.log(`Server's URL is ${process.env.SERVER_URL}`));
+async function runSingleDeliveryCheck() {
+    const entries = await Request.find(); // Gets all entries from DB.
+    //console.log(entries);
+
+    entries.forEach(async entry => {
+        if (!entry.isDelivered) {
+            const email = entry.email;
+            const status = await Tracking.checkDelivery(entry.trackingNum, entry.courier);
+            //console.log(`email: ${email}, status: ${status}`);
+
+            if (status.delivered) {
+                entry.isDelivered = true;
+                entry.save();
+                console.log("Emailing the client at " + email);
+            }
+        }
+    });
+
+    console.log("All delivery check are done!");
+}
+
+function runDeliveryChecks(interval = 180 * 1000) {
+    setInterval(() => {
+        runSingleDeliveryCheck();
+    }, interval);
+}
+
+app.listen(port, () => {
+    console.log(`Server is ready and running on ${process.env.SERVER_URL}`);
+    runDeliveryChecks();
+});
