@@ -1,11 +1,13 @@
+require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
 const mongoose = require('mongoose');
+const admin = require('firebase-admin');
+const serviceAccount = require(process.env.SERVICE_ACCOUNT);
 const Request = require("./models/request.model");
 const Tracking = require("./tracking-scripts/tracking");
 const sendEmail = require("./email/send-email");
-
-require("dotenv").config();
+const PUSH_NOTIFY = true;
 
 const app = express();
 const port = process.env.SERVER_PORT || 3000;
@@ -17,6 +19,29 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
     console.log("Connection to MongoDB has been established successfylly!");
 });
+
+// Firebase initialization.
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: process.env.DATABASE_URL
+});
+
+// Firebase message payload.
+const payload = {
+    data: {
+        someKey: "someValue" // Sending optional data.
+    },
+    notification: {
+        body: "Your package has been delivered!"
+    }
+};
+
+// Firebase message options.
+const options = {
+    priority: "High",
+    timeToLive: 60 * 60 * 24,
+    userInteraction: true
+};
 
 app.use(cors());
 app.use(express.urlencoded()); // To support URL-encoded bodies.
@@ -70,6 +95,7 @@ app.post("/requestTracking", (req, res) => {
             email: req.body.email,
             trackingNum: req.body.trackingNum,
             courier: Tracking.determineCourier(req.body.trackingNum),
+            token: req.body.token
             // isDelivered: false // Already, taken care by the 'default' attribute in DB Schema.
         })
         .save((err, entry) => {
@@ -139,7 +165,7 @@ async function runSingleDeliveryCheck() {
     //console.log(entries);
 
     entries.forEach(async entry => {
-        const {email, username} = entry;
+        const {email, username, token} = entry;
 
         if (!entry.isDelivered) {
             const status = await Tracking.checkDelivery(entry.trackingNum, entry.courier);
@@ -148,25 +174,63 @@ async function runSingleDeliveryCheck() {
             if (status.delivered) {
                 entry.isDelivered = true;
                 // entry.save();
-                console.log("Sending email to the client " + email);
-                sendEmail(email, username)
+                // console.log("Sending notification to the client. . .");
+
+                if (PUSH_NOTIFY) {
+                    admin.messaging().sendToDevice(token, payload, options)
+                        .then((res) => {
+                            // console.log("Sent succsessfully!");
+                            // console.log(res);
+                            entry.sentNotification = true;
+                            entry.save();
+                    })
+                    .catch((err) => {
+                        // console.log("Error sending message: ");
+                        // console.log(err);
+                        entry.save();
+                    });                
+                } else {
+                    sendEmail(email, username)
                     .then(() => {
-                        console.log("Email has been sent!");
-                        entry.sentEmail = true;
+                        // console.log("Email has been sent!");
+                        entry.sentNotification = true;
                         entry.save();
                     })
-                    .catch(err => console.log(err));
+                    .catch(err => {
+                        // console.log(err);
+                        entry.save();
+                    });
+                }
             }
 
-        } else if (!entry.sentEmail) {
-            console.log("Sending email to the client " + email)
-            sendEmail(email, username)
-                .then(() => {
-                    console.log("Email has been sent!");
-                    entry.sentEmail = true;
-                    entry.save();
-                })
-                .catch(err => console.log(err));
+        } else if (!entry.sentNotification) {
+            // console.log("Sending notification to the client. . .");
+
+            if (PUSH_NOTIFY) {
+                admin.messaging().sendToDevice(token, payload, options)
+                    .then((res) => {
+                        // console.log("Sent succsessfully!");
+                        // console.log(res);
+                        entry.sentNotification = true;
+                        entry.save();
+                    })
+                    .catch((err) => {
+                        // console.log("Error sending message: ");
+                        // console.log(err);
+                        entry.save();
+                    });
+            } else {
+                sendEmail(email, username)
+                    .then(() => {
+                        // console.log("Email has been sent!");
+                        entry.sentNotification = true;
+                        entry.save();
+                    })
+                    .catch(err => {
+                        // console.log(err);
+                        entry.save();
+                    });
+            }
         }
     });
 

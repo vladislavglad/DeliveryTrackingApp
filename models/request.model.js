@@ -18,11 +18,15 @@ const requestSchema = new mongoose.Schema({
     courier: {
         type: String
     },
+    token: {
+        type: String,
+        required: true,
+    },
     isDelivered: {
         type: Boolean,
         default: false
     },
-    sentEmail: {
+    sentNotification: {
         type: Boolean,
         default: false
     }

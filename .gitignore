@@ -1,6 +1,8 @@
 trackingNums.txt
 debuging.js
 .env
+deliverytracking-*.json
+push*.js
 
 node_modules/**/*
 .expo/*
