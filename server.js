@@ -79,14 +79,28 @@ app.get("/lookup/:trackingNum", async (req, res) => {
     }
 });
 
+app.get("/checkStatus/:trackingNum", async (req, res) => {
+    const number = req.params.trackingNum;
+    const status = await Tracking.checkDelivery(number);
+    // console.log(status);
+
+    if (!status.courier) 
+        res.send({msg: "Your tracking number is invalid!"});
+    else if (status.delivered) 
+        res.send({msg: "Your package has been delivered!"});
+    else if (status.delivered === null) 
+        res.send({msg: "Cannot determine delivery status!"});
+    else 
+        res.send({msg: "Your package has not been delivered!"});
+
+});
+
 app.post("/requestTracking", (req, res) => {
     // console.log("\nrecieved new POST request:");
     // console.log(req.body);
 
-    if (req.body.email === "")
+    if (req.body.email === "" && !PUSH_NOTIFY) // If notification option is through email.
         res.send({msg: "Please provide valid email!"});
-    else if (req.body.trackingNum === "")
-        res.send({msg: 'Please provide a tracking number!'});
     else if (Tracking.determineCourier(req.body.trackingNum) === null)
         res.send({msg: "Your tracking number is invalid!"});
     else {

@@ -6,8 +6,7 @@ const requestSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        unique: true,
-        required: true
+        required: false
     },
     trackingNum : {
         type: String,
