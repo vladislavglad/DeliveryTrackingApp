@@ -2,9 +2,13 @@
 
 ### This mobile app lets you request delivery tracking of your packages.
 
-* Supports 3 major shipping companies (UPS, USPS, Lasership).
-* All you have to do is to privide a tracking number of your package; the rest is handled!  
+* Supports tracking with 3 major shipping companies (UPS, USPS, Lasership).
+* All you have to do is to provide a tracking number of your package; the rest is handled!  
 * Whenever package is delivered, you will get notified **right away** either by email (that you provided) or push-notificaton.
+
+**Note:** server-side and client-side are both contained within this repo. 
+There is a separate repo found **[HERE](https://github.com/vladislavglad/DeliveryTrackingUI)** 
+for client-side only with unmanaged flow (expo-free React Native project) that can actually build into a mobile app (not just QR code preview).
 
 **Motivation:** whenever I buy something valuable off of Amazon, I would impatiantly check if the package is delivered or not. 
 Amazon itself does not update the delivery status righ away sometimes it takes hours before the status is updated and you get notified. 
